@@ -1,0 +1,29 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    env:
+      CI: ""
+
+    steps:
+    - uses: actions/checkout@v2
+   
+    - uses: actions/checkout@v2
+
+    - uses: Azure/docker-login@v1
+      with:
+        login-server: ttacrbyskvloe5jfqa.azurecr.io
+        username: ttacrbyskvloe5jfqa
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - run: |
+        cd Source/Tailwind.Traders.Web  
+        docker build -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:${{ github.sha }} -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:latest .
+        docker push ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40
+        cd ..
