@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: drop
-        path: "./TailwindTraders.Website/Source/Tailwind.Traders.Web/production"
+        path: "./production"
 
   deploy:
     runs-on: ubuntu-18.04
