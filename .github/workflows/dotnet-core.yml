@@ -23,7 +23,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - run: |
-        cd Tailwind.Traders.Web/Source/Tailwind.Traders.Web
+        cd TailwindTraders.Website/Source/Tailwind.Traders.Web
         docker build -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:${{ github.sha }} -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:latest .
         docker push ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40
         cd ..
