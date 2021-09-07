@@ -25,22 +25,22 @@ jobs:
         node-version: 10.x
    
     - name: Install dependencies
-      run: dotnet restore ./Source/*.sln
+      run: dotnet restore ./TailwindTraders.Website/Source/*.sln
    
     - name: Build
-      run: dotnet build ./Source/*.sln --configuration Release --no-restore
+      run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
    
     - name: Test
-      run: dotnet test ./Source/*.sln --no-restore --verbosity normal
+      run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
     
     - name: Publish
-      run: dotnet publish ./Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './staging'
+      run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: drop
-        path: "./Source/Tailwind.Traders.Web/staging"
+        path: "./TailwindTraders.Website/Source/Tailwind.Traders.Web/production"
 
   deploy:
     runs-on: ubuntu-18.04
@@ -53,11 +53,11 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: drop
-        path: "./staging"
+        path: "./production"
 
     - name: Deploy to Website
       uses: azure/webapps-deploy@v2
       with:
         app-name: TailwindTraders-ADO40
         publish-profile: ${{ secrets.PUBLISH_PROFILE_PROD }}
-        package: "./staging"
+        package: "./production"
