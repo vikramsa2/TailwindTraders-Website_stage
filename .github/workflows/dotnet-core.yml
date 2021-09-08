@@ -28,7 +28,7 @@ jobs:
       with:
         login-server: ttacrbyskvloe5jfqa.azurecr.io
         username: ttacrbyskvloe5jfqa
-        password: ${{ secrets.kvSecretsAction.outputs.DockerPassword }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - run: |
         cd TailwindTraders.Website/Source/Tailwind.Traders.Web
