@@ -1,0 +1,53 @@
+name: Deploy ASP.NET Core app to Dev
+
+on:
+  push:
+    branches:
+      - '*feature'
+     
+  pull_request:
+    branches:
+      - '*'
+
+env:
+  AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: './TailwindTraders.Website/Source'      # set this to the path to your web app project, defaults to the repository root
+  DOTNET_VERSION: '5.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+
+      # Checkout the repo
+      - uses: actions/checkout@main
+      
+      # Setup .NET Core SDK
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+      # Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with: 
+          node-version: 10.x
+      
+      # Run dotnet build and publish
+      - name: dotnet build and publish
+        run: |
+          dotnet restore ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*.sln
+          dotnet build ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*.sln --configuration Release --no-restore
+          dotnet test ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/*.sln --no-restore --verbosity normal
+          dotnet publish ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dev' 
+
+      # Deploy to Azure Web apps
+      - name: 'Run Azure webapp deploy action using publish profile credentials'
+        uses: azure/webapps-deploy@v2
+        with: 
+          app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
+          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/dev'
+
