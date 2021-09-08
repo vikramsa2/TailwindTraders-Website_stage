@@ -14,10 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: Azure/docker-login@v1
-      with: 
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     - uses: Azure/get-Keyvault-secrets@v1.0
       with: 
         keyvault: "TailwindTraders-Demo-KV"
