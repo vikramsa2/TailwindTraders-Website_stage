@@ -23,6 +23,8 @@ jobs:
         keyvault: "TailwindTraders-Demo-KV"
         secrets: 'DockerPassword'
       id: kvSecretAction
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
     - uses: Azure/docker-login@v1
       with:
