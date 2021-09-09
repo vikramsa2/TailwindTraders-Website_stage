@@ -9,7 +9,7 @@ env:
   DOTNET_VERSION: 5.x
 
   # Declaring the version of Node to be used
-  NODE_VERSION: 10.s
+  NODE_VERSION: 10.x
 
 jobs:
   buildImage:
