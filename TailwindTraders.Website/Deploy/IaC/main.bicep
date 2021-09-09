@@ -8,7 +8,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 
 module WebApp './webappdemo.bicep' = {
   name: 'DevWebapp'
-  scope: resourceGroup(rgName)
+  scope: resourceGroup(rg.name)
   params: {
     location: location
  }
