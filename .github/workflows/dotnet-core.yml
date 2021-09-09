@@ -1,40 +1,45 @@
-name: .NET Core
+name: WebApp Workflow
 
 on:
   push:
     branches: [ main ]
 
-jobs:
-  build:
+env:
+  # Declaring the version of .NET to be used
+  DOTNET_VERSION: 5.x
 
-    runs-on: ubuntu-18.04
+  # Declaring the version of Node to be used
+  NODE_VERSION: 10.s
+
+jobs:
+  buildImage:
+    name: build provider image
+    runs-on: ubuntu-latest
     env:
       CI: ""
 
     steps:
-    - uses: actions/checkout@v2
 
-    - uses: Azure/login@v1
+    - name: Checkout main branch
+      uses: actions/checkout@v2
+   
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS}}
-
-    - uses: Azure/get-Keyvault-secrets@v1.0
-      with: 
-        keyvault: "TailwindTraders-Demo-KV"
-        secrets: 'DockerPassword'
-      id: kvSecretAction
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-
-    - uses: Azure/docker-login@v1
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+   
+    - name: Setup Node
+      uses: actions/setup-node@v1
       with:
-        login-server: ttacrbyskvloe5jfqa.azurecr.io
-        username: ttacrbyskvloe5jfqa
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - run: |
-        cd TailwindTraders.Website/Source/Tailwind.Traders.Web
-        docker build -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:${{ github.sha }} -t ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:latest .
-        docker push ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:latest
-        docker push ttacrbyskvloe5jfqa.azurecr.io/tailwindtraders-ado40:${{ github.sha }}
-        cd ..
+        node-version: ${{ env.NODE_VERSION }}
+   
+    - name: Install dependencies in app
+      run: dotnet restore ./TailwindTraders.Website/Source/*.sln
+   
+    - name: Build dotnet
+      run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
+   
+    - name: Test dotnet
+      run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
+    
+ 
