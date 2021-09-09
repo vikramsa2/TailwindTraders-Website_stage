@@ -12,7 +12,7 @@ env:
   NODE_VERSION: 10.x
 
 jobs:
-  buildImage:
+  build:
     name: build 
     runs-on: ubuntu-latest
     env:
