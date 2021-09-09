@@ -1,5 +1,5 @@
 param location string = 'centralus'
-param rgName string = 'RG-TWTradersADO40'
+param rgName string = 'RG-Dev-TailwindTraders'
 
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: rgName
