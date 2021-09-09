@@ -26,14 +26,14 @@ jobs:
       uses: Azure/get-Keyvault-secrets@v1.0
       with: 
         keyvault: TailwindTraders-Demo-KV
-        secrets: 'DockerPassword'
+        secrets: 'DockerPassword, DockerUsername'
       id: kvSecretAction
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
     # Login to Azure Container Registry
     - name: Docker Login
-      uses: Azure/docker-login@v1.10.0
+      uses: Azure/docker-login@v1
       with:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
         username: ${{ steps.kvSecretsAction.outputs.DockerUsername }}
