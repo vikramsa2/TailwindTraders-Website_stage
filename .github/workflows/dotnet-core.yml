@@ -37,7 +37,7 @@ jobs:
       with:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.kvSecretsAction.outputs.DockerPassword }}
 
     # Build Docker image and push to Azure Container Registry
     - run: |
