@@ -25,7 +25,7 @@ jobs:
     - name: Azure KeyVault 
       uses: Azure/get-Keyvault-secrets@v1.0
       with: 
-        keyvault: ${{ secrets.KEYVAULT_DEMO }}
+        keyvault: TailwindTraders-Demo-KV
         secrets: 'DockerPassword'
       id: kvSecretAction
       env:
@@ -37,7 +37,7 @@ jobs:
       with:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.kvSecretsAction.outputs.DockerPassword }}
+        password: ${{ secrets.kvSecretsAction.outputs.DockerPassword }} 
 
     # Build Docker image and push to Azure Container Registry
     - run: |
