@@ -41,3 +41,33 @@ jobs:
    
     - name: Test dotnet
       run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
+
+    - name: Publish with dotnet
+      run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: drop
+        path: "./production"
+
+  # Deployment tasks
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: Production
+
+    steps:
+
+    - name: Download Artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: drop
+        path: "./production"
+
+    - name: Deploy to Website
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ secrets.WEBAPP_NAME}}
+        publish-profile: ${{ secrets.PUBLISH_PROFILE_PROD }}
+        package: "./production"
