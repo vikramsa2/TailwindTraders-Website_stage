@@ -7,11 +7,11 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 }
 
 module WebApp './webappdemo.bicep' = {
-  name: 'Dev Webapp'
+  name: 'DevWebapp'
   scope: resourceGroup(rgName)
   params: {
     location: location
  }
 }
 
-output acrLoginServer string = acr.properties.loginServer
+
