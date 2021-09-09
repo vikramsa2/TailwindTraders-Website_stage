@@ -6,8 +6,8 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   location: location
 }
 
-module ACR './ACRDemo.bicep' = {
-  name: 'ACR Demo'
+module WebApp './webappdemo.bicep' = {
+  name: 'Dev Webapp'
   scope: resourceGroup(rgName)
   params: {
     location: location
