@@ -36,7 +36,7 @@ jobs:
       uses: Azure/docker-login@v1
       with:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
-        username: ${{ steps.kvSecretAction.outputs.DockerUsername }}a
+        username: ${{ steps.kvSecretAction.outputs.DockerUsername }}
         password: ${{ steps.kvSecretAction.outputs.DockerPassword }} 
 
     # Build Docker image and push to Azure Container Registry
