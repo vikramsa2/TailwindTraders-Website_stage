@@ -1,9 +1,7 @@
 name: Developer Environment Workflow
 
 on:
-
-  workflow_dispatch:
-    
+   
   pull_request:
     branches:
       - main 
@@ -26,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    # checkout branch
+    # checkout code
     - name: checkout main branch
       uses: actions/checkout@v2
 
@@ -64,6 +62,10 @@ jobs:
       url: "https://bing.com"
 
     steps:
+    # checkout code
+    - name: checkout main branch
+      uses: actions/checkout@v2
+      
     - name: Deploy infrastructure
       id: azure-deployment
       shell: pwsh
