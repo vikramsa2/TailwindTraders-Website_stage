@@ -149,9 +149,8 @@ jobs:
           --resource-group ${{ secrets.RG_NAME }} `
           --webapp-name ${{ secrets.WEBAPP_NAME }} `
           --output json) | ConvertFrom-Json
-        Write-Output "$appurl"
-        Write-Output "The webapp URL is https://$($appurl.name.value)"
-        Write-Output "::set-output name=webAppUrl::https://$($appurl.name.value)"
+        Write-Output "The webapp URL is https://$($appurl.name)"
+        Write-Output "::set-output name=webAppUrl::https://$($appurl.name)"
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 
 
