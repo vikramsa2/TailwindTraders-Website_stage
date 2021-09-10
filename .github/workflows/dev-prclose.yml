@@ -1,0 +1,8 @@
+on pr close
+
+
+AZ login
+
+AZ delete 
+
+DEV_RG_NAME: "RG-Dev-TailwindTraders"-${{github.event.pull_request.number}}
