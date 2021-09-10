@@ -50,11 +50,11 @@ jobs:
       run: dotnet restore ./TailwindTraders.Website/Source/*.sln
 
     - name: Build, test and publish with dotnet
-      working-directory: TailwindTraders.Website/Source/Tailwind.Traders.Web
+      working-directory: ./TailwindTraders.Website/Source/*.sln
       run: |
         dotnet build --configuration Release --no-restore
         dotnet test --no-restore --verbosity normal
-        dotnet publish ./Tailwind.Traders.Web.csproj -c Release -o publish  
+        dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o publish  
     # TODO  - Build and test code
 
   buildImage:
