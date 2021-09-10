@@ -54,7 +54,7 @@ jobs:
    
   deploy_container:
     # Build Docker Image and push to Azure Container Registry
-    if: github.event_name == 'push'
+    # if: github.event_name == 'push'
     runs-on: ubuntu-latest
     name: Create and Deploy Container to Azure
     needs: buildImage
