@@ -3,11 +3,10 @@ name: Developer Environment Workflow
 on:
   pull_request:
     branches:
-      - [main]
-      - dev
+      - main 
     paths:
       - TailwindTraders.Website/Deploy/IaC/**
-  
+ 
 env:
 
   # The name of the resource group to be created.
