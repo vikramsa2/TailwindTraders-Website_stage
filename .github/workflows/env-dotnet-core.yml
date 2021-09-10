@@ -4,8 +4,8 @@ on:
   push:
     branches: 
       - main 
-    paths:
-      - TailwindTraders.Website/Source/**   
+    # paths:
+    #   - TailwindTraders.Website/Source/**   
 
 env:
 
@@ -163,7 +163,7 @@ jobs:
     # declare GitHub Environment - Staging
     environment:
       name: Staging
-      url:  ${{ secrets.STAGING_SLOT }}
+      url:  https://production-tailwindtraders-ado40-staging.azurewebsites.net
  
     steps:
     # checkout code
