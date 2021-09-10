@@ -60,7 +60,7 @@ jobs:
     needs: buildImage
 
     environment:
-      name: dev
+      name: Dev
       url: "https://bing.com"
 
     steps:
