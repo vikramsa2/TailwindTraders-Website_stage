@@ -57,7 +57,7 @@ jobs:
     
     - name: Publish with dotnet
       run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production' 
-    # TODO  - Build and test code
+    
 
   buildImage:
     name: Buid and Push Docker Image
@@ -103,7 +103,7 @@ jobs:
     # declare GitHub Environment
     environment:
       name: Dev
-      url: "https://${{ env.DEV_WEBAPP_NAME}}.azurewebsites.net" #TODO - Display URL
+      url: https://${{ env.DEV_WEBAPP_NAME}}.azurewebsites.net 
 
     steps:
     # checkout code
@@ -148,8 +148,6 @@ jobs:
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 
-    
-    # TODO: Az CLI Deploy Container Task
 
 
  
