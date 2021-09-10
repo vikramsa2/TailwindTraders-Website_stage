@@ -64,7 +64,7 @@ jobs:
 
     # Deploy Bicep
 
-#   replace `dockerImage` and `webAppName` with a variable?
+
 
     - name: Deploy infrastructure
       id: azure-deployment
@@ -147,9 +147,24 @@ jobs:
       with:
         push: true
         tags: ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:latest
-        context: TailwindTraders.Website/Source/Tailwind.Traders.Web/Dockerfile
+        context: ./TailwindTraders.Website/Source/Tailwind.Traders.Web/
 
-      
+    - name: Deploy infrastructure
+      id: azure-deployment
+      shell: pwsh
+      run: |
+        $deployment = $(az deployment sub create --name ${{ env.DEV_RG_NAME }} `
+          --location ${{ env.DEV_LOCATION }} `
+          --template-file ./main.bicep `
+          --parameters location=${{ env.DEV_LOCATION }} `
+          --parameters rgName=${{ env.DEV_RG_NAME }} `
+          --parameters webAppName=${{ env.DEV_WEBAPP_NAME}} `
+          --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
+          --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
+          --parameters dockerRegistryServerPassword=${{ steps.DOCKER_PASSWORD }} `
+          --parameters dockerImage=tailwindtraders-ado40:latest `
+          --output json) | ConvertFrom-Json
+      working-directory: ./TailwindTraders.Website/Deploy/IaC
     
  
 
