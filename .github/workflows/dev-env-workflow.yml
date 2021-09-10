@@ -3,6 +3,7 @@ name: Developer Environment Workflow
 on:
   pull_request:
     branches:
+      - [main]
       - dev
     paths:
       - TailwindTraders.Website/Deploy/IaC/**
