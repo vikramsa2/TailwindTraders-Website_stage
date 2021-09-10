@@ -93,8 +93,8 @@ jobs:
     # declare GitHub Environment - Canary
     environment:
       name: canary
-      url: https://${{ secrets.WEBAPP_NAME }}.azurewebsites.net 
-
+      url:  ${{ steps.get-webapp-url.outputs.webAppUrl }}
+ 
     steps:
     # checkout code
     - name: checkout branch
@@ -138,6 +138,18 @@ jobs:
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 
+    # Get the URL for the Azure WebApp
+    - name: Get the Webapp URL
+      id: get-webapp-url
+      shell: pwsh
+      run: |
+        $appurl = $(az webapp config hostname list
+          --resource-group ${{ secrets.RG_NAME }} `
+          --webapp-name ${{ secrets.WEBAPP_NAME }} `
+          --output json) | ConvertFrom-Json
+        Write-Output "The webapp URL is https://$($appurl.name.value)"
+        Write-Output "::set-output name=webAppUrl::https://$($appurl.name.value)"
+      working-directory: ./TailwindTraders.Website/Deploy/IaC
 
 
  
