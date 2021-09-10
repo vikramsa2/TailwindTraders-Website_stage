@@ -5,16 +5,16 @@ on:
     branches:
       - dev
     paths:
-      - twitter-sentiment-processor/demos/demo2/**
+      - TailwindTraders.Website/Deploy/IaC/**
   workflow_dispatch:
 
 env:
 
   # The name of the resource group to be created.
-  RG_NAME: "RG-Dev-WebApp"
+  DEV_RG_NAME: "RG-Dev-TailwindTraders"
 
   # The location to store the meta data for the deployment.
-  LOCATION: "centralus"
+  DEV_LOCATION: "westeurope"
 
   # Declaring the version of .NET to be used
   DOTNET_VERSION: 5.x
@@ -54,39 +54,51 @@ jobs:
       uses: azure/arm-deploy@v1
       with: 
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-        resourceGroupName: ${{ secrets.DEV_RG_AZURE }}
+       
         template: ./azuredeploy.bicep
         parameters: storagePrefix=mystore
         failOnStdErr: false
 
+    # Deploy Bicep File - The right way
+    - name: Deploy WebApp
+      id: azure-deployment
+      shell: pwsh
+      run: |
+        $deployment = $(az deployment sub create --name ${{ env.DEV_RG_NAME }} `
+          --location ${{ env.DEV_LOCATION }} `
+          --template-file ./main.bicep `
+          --parameters location=${{ env.DEV_LOCATION }} `
+          --parameters rgName=${{ env.DEV_RG_NAME }} `
+          --output json) | ConvertFrom-Json
+        # Get all the outputs
+        Write-Output "::set-output name=aksName::$($deployment.properties.outputs.aksName.value)"
+        Write-Output "::set-output name=storageAccountKey::$($deployment.properties.outputs.storageAccountKey.value)"
+        Write-Output "::set-output name=serviceBusEndpoint::$($deployment.properties.outputs.serviceBusEndpoint.value)"
+        Write-Output "::set-output name=storageAccountName::$($deployment.properties.outputs.storageAccountName.value)"
+        Write-Output "::set-output name=cognitiveServiceKey::$($deployment.properties.outputs.cognitiveServiceKey.value)"
+        Write-Output "::set-output name=cognitiveServiceEndpoint::$($deployment.properties.outputs.cognitiveServiceEndpoint.value)"
+      working-directory: ./twitter-sentiment-processor/demos/demo3
 
-
-    
-
-    steps:
-
-      
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-   
-    - name: Setup Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-   
     - name: Install dependencies in app
       run: dotnet restore ./TailwindTraders.Website/Source/*.sln
    
-    - name: Build dotnet
-      run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
+    - name: Build, test and publish with dotnet
+      working-directory: ./TailwindTraders.Website/Source/*.sln
+      run: |
+        dotnet build --configuration Release
+        dotnet test --no-restore --verbosity normal
+        dotnet publish -c Release -o publish
+
+
+    # - name: Build dotnet
+    #   run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
    
-    - name: Test dotnet
-      run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
+    # - name: Test dotnet
+    #   run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
     
-    - name: Publish with dotnet
-      run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
+    # - name: Publish with dotnet
+    #   run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
+
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
