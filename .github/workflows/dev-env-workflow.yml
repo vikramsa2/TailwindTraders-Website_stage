@@ -7,7 +7,7 @@ on:
     paths:
       - TailwindTraders.Website/Deploy/IaC/**
   workflow_dispatch:
-  
+
 env:
 
   # The name of the resource group to be created.
@@ -72,7 +72,7 @@ jobs:
       run: |
         $deployment = $(az deployment sub create --name ${{ env.DEV_RG_NAME }} `
           --location ${{ env.DEV_LOCATION }} `
-          --template-file ./iac/main.bicep `
+          --template-file ./main.bicep `
           --parameters location=${{ env.DEV_LOCATION }} `
           --parameters rgName=${{ env.DEV_RG_NAME }} `
           --parameters webAppName=${{ env.DEV_WEBAPP_NAME}} `
