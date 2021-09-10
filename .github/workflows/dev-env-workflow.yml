@@ -16,6 +16,9 @@ env:
   # The location to store the meta data for the deployment.
   DEV_LOCATION: "westeurope"
 
+  # The name of the WebApp
+  DEV_WEBAPP_NAME: "DEV-TailwindTraders-ADO40"
+
   # Declaring the version of .NET to be used
   DOTNET_VERSION: 5.x
 
@@ -32,16 +35,16 @@ jobs:
     - name: checkout main branch
       uses: actions/checkout@v2
 
-    # setup .NET and Node
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+    # # setup .NET and Node
+    # - name: Setup .NET Core
+    #   uses: actions/setup-dotnet@v1
+    #   with:
+    #     dotnet-version: ${{ env.DOTNET_VERSION }}
    
-    - name: Setup Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
+    # - name: Setup Node
+    #   uses: actions/setup-node@v1
+    #   with:
+    #     node-version: ${{ env.NODE_VERSION }}
 
     # log into Azure
     - name: "Login via Azure CLI"
@@ -49,35 +52,51 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    # Deploy Bicep File
-    - name: Deploy WebApp
-      uses: azure/arm-deploy@v1
-      with: 
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+    # # Deploy Bicep File
+    # - name: Deploy WebApp
+    #   uses: azure/arm-deploy@v1
+    #   with: 
+    #     subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
        
-        template: ./azuredeploy.bicep
-        parameters: storagePrefix=mystore
-        failOnStdErr: false
+    #     template: ./azuredeploy.bicep
+    #     parameters: storagePrefix=mystore
+    #     failOnStdErr: false
 
-    # Deploy Bicep File - The right way
-    - name: Deploy WebApp
+    # Deploy Bicep
+
+#   replace `dockerImage` and `webAppName` with a variable?
+
+    - name: Deploy infrastructure
       id: azure-deployment
       shell: pwsh
       run: |
         $deployment = $(az deployment sub create --name ${{ env.DEV_RG_NAME }} `
           --location ${{ env.DEV_LOCATION }} `
-          --template-file ./main.bicep `
+          --template-file ./iac/main.bicep `
           --parameters location=${{ env.DEV_LOCATION }} `
           --parameters rgName=${{ env.DEV_RG_NAME }} `
+          --parameters webAppName=${{ env.DEV_WEBAPP_NAME}} `
+          --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
+          --parameters dockerRegistryServerUsername=${{ steps.kvSecretAction.outputs.DockerUsername }} `
+          --parameters dockerRegistryServerPassword=${{ steps.kvSecretAction.outputs.DockerPassword }} `
+          --parameters dockerImage=tailwindtraders-ado40:latest `
           --output json) | ConvertFrom-Json
-        # Get all the outputs
-        Write-Output "::set-output name=aksName::$($deployment.properties.outputs.aksName.value)"
-        Write-Output "::set-output name=storageAccountKey::$($deployment.properties.outputs.storageAccountKey.value)"
-        Write-Output "::set-output name=serviceBusEndpoint::$($deployment.properties.outputs.serviceBusEndpoint.value)"
-        Write-Output "::set-output name=storageAccountName::$($deployment.properties.outputs.storageAccountName.value)"
-        Write-Output "::set-output name=cognitiveServiceKey::$($deployment.properties.outputs.cognitiveServiceKey.value)"
-        Write-Output "::set-output name=cognitiveServiceEndpoint::$($deployment.properties.outputs.cognitiveServiceEndpoint.value)"
-      working-directory: ./twitter-sentiment-processor/demos/demo3
+      working-directory: ./TailwindTraders.Website/Deploy/IaC
+
+## Test command
+
+      # az deployment sub create \
+      #   --name rg-russ-test3 \
+      #   --location uksouth \
+      #    --template-file main.bicep \
+      #   --parameters location=uksouth \
+      #   --parameters rgName=rg-russ-test3 \
+      #   --parameters webAppName=russtestweb3 \
+      #   --parameters dockerRegistryHost=ttacrbyskvloe5jfqa.azurecr.io \
+      #   --parameters dockerRegistryServerUsername=ttacrbyskvloe5jfqa \
+      #   --parameters dockerRegistryServerPassword=g9oLm6pTAwFWU9icwAg8L9 \
+      #   --parameters dockerImage=tailwindtraders-ado40:latest \
+      #   --output json
 
     - name: Install dependencies in app
       run: dotnet restore ./TailwindTraders.Website/Source/*.sln
@@ -89,148 +108,55 @@ jobs:
         dotnet test --no-restore --verbosity normal
         dotnet publish -c Release -o publish
 
-
-    # - name: Build dotnet
-    #   run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
-   
-    # - name: Test dotnet
-    #   run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
-    
-    # - name: Publish with dotnet
-    #   run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
-
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: drop
-        path: "./production"
-
-  # Deployment tasks
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment: Production
-
-    steps:
-
-    - name: Download Artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: drop
-        path: "./production"
-
-    - name: Deploy to Website
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ secrets.WEBAPP_NAME}}
-        publish-profile: ${{ secrets.PUBLISH_PROFILE_PROD }}
-        package: "./production"
-
-
-
-
- 
-
-
-    # Setup Dapr
-    - name: Install Dapr
-      uses: dapr/setup-dapr@v1
-
-    # dapr init
-    - name: Initialize Dapr
-      shell: pwsh
-      run: |
-        Write-Host "${{ steps.azure-deployment.outputs.aksName }}"
-        # Get the credentials to use with dapr init and helm install
-        az aks get-credentials --resource-group ${{ env.RG_NAME }} --name "${{ steps.azure-deployment.outputs.aksName }}"
-        # Initialize Dapr
-        # Dapr init is very noisy in the logs so group these lines so
-        # it can be collapsed.
-        Write-Output "::group::Initialize Dapr"
-        dapr init --kubernetes --wait --runtime-version ${{ env.DAPR_VERSION }}
-        Write-Output "::endgroup::"
-        dapr status --kubernetes
-      working-directory: ./twitter-sentiment-processor/demos/demo3
-    
     - name: "docker login"
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.CONTAINER_REGISTRY }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+ 
 
+
+    # - name: Upload Artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: drop
+    #     path: "./dev"
+
+  # # Dev Deployment tasks
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: buildImage
+  #   environment: Dev
+
+  #   steps:
+
+  #   - name: Download Artifact
+  #     uses: actions/download-artifact@v2
+  #     with:
+  #       name: drop
+  #       path: "./dev"
+
+
+    
+    
+  # Build Docker Image and push to Azure Container Registry
     - name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ${{ secrets.CONTAINER_REGISTRY }}/provider:${{ github.run_number }}
-        context: ./twitter-sentiment-processor/demos/demo2/provider/
+        tags: ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:latest
+        context: TailwindTraders-Website/TailwindTraders.Website/.devcontainer
     
-    - name: Get Dev K8s Context
-      uses: azure/aks-set-context@v1
-      with:
-        creds: "${{ secrets.AZURE_CREDENTIALS }}"
-        cluster-name: ${{ steps.azure-deployment.outputs.aksName }}
-        resource-group: ${{ env.RG_NAME }}
-    
-    - name: Create valid namespace name
-      id: generate-valid-namespace-name
-      run: |
-        namespaceName=${GITHUB_HEAD_REF::63}        
-        namespaceName=$(echo ${namespaceName//[!0-9a-zA-Z]/-} | tr '[:upper:]' '[:lower:]' | sed -e 's/^-/z/' -e 's/-$/z/')
-        echo ::set-output name=result::$namespaceName
-    
-    - name: Setup Helm
-      uses: azure/setup-helm@v1
-      with:
-        version: '3.6.3'
-      id: install
+ 
 
-    - name: Helm Install PR
-      run: |
-        CHARTDIR="./charts/"
-        echo "---"
-        echo "Chart directory: $CHARTDIR"
-        
-        helm dependency update "$CHARTDIR"
-        helm upgrade \
-          --install twitter-kubecon "$CHARTDIR" \
-          --namespace twitter-kubecon --create-namespace \
-          --set provider.image=${{ secrets.CONTAINER_REGISTRY }}/provider:${{ github.run_number }} \
-          --set viewer.image=${{ secrets.CONTAINER_REGISTRY }}/viewer:1.0.0 \
-          --set viewer.ingress.hosts={twitter-kubecon.viewer.40.88.250.252.nip.io} \
-          --set zipkin.ingress.hosts={twitter-kubecon.zipkin.40.88.250.252.nip.io} \
-          --set processor.cognitiveService.token=${{ steps.azure-deployment.outputs.cognitiveServiceKey }} \
-          --set components.twitter.consumerKey=${{ secrets.TWITTER_CONSUMERKEY }} \
-          --set components.twitter.consumerSecret=${{ secrets.TWITTER_CONSUMERSECRET }} \
-          --set components.twitter.accessToken=${{ secrets.TWITTER_ACCESSTOKEN }} \
-          --set components.twitter.accessSecret=${{ secrets.TWITTER_ACCESSSECRET }} \
-          --set components.serviceBus.connectionString="${{ steps.azure-deployment.outputs.serviceBusEndpoint }}" \
-          --set components.tableStorage.key="${{ steps.azure-deployment.outputs.storageAccountKey }}" \
-          --set components.tableStorage.name="${{ steps.azure-deployment.outputs.storageAccountName }}" \
-          --set components.tracing.zipkin.endpointAddress="http://zipkin.twitter-kubecon.svc.cluster.local:9411/api/v2/spans" \
-          --set processor.cognitiveService.endpoint="${{ steps.azure-deployment.outputs.cognitiveServiceEndpoint }}" \
-          --set fullnameOverride=provider-pr
-      working-directory: ./twitter-sentiment-processor/demos/demo3
 
-    - name: Add a dash of confidence
-      uses: microsoft/mindaro/actions/add-review-url@Releases/v1              
-      with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}  
-          branch-name: ${{steps.generate-valid-namespace-name.outputs.result}}
-          host: "viewer.${{ secrets.HOST }}" ## TODO see if we can not hard code ingress.hosts
-          protocol: "http"
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+    # - name: Add a dash of confidence
+    #   uses: microsoft/mindaro/actions/add-review-url@Releases/v1              
+    #   with:
+    #       repo-token: ${{ secrets.GITHUB_TOKEN }}  
+    #       branch-name: ${{steps.generate-valid-namespace-name.outputs.result}}
+    #       host: "viewer.${{ secrets.HOST }}" ## TODO see if we can not hard code ingress.hosts
+    #       protocol: "http"
+
