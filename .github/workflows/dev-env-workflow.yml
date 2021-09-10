@@ -77,8 +77,8 @@ jobs:
           --parameters rgName=${{ env.DEV_RG_NAME }} `
           --parameters webAppName=${{ env.DEV_WEBAPP_NAME}} `
           --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
-          --parameters dockerRegistryServerUsername=${{ steps.kvSecretAction.outputs.DockerUsername }} `
-          --parameters dockerRegistryServerPassword=${{ steps.kvSecretAction.outputs.DockerPassword }} `
+          --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
+          --parameters dockerRegistryServerPassword=${{ steps.DOCKER_PASSWORD }} `
           --parameters dockerImage=tailwindtraders-ado40:latest `
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
