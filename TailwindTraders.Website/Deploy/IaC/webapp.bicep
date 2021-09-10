@@ -7,8 +7,8 @@ param dockerRegistryServerUsername string = 'yourregistry'
 param dockerRegistryServerPassword string = 'somepassword'
 param dockerImage string = 'imagename'
 
-var appServicePlanName = toLower('asp-${webAppName}')
-var webSiteName = toLower('wapp-${webAppName}')
+var appServicePlanName = toLower('appsvc-${webAppName}')
+var webSiteName = toLower('${webAppName}')
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: appServicePlanName
