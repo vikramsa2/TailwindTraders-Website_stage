@@ -66,6 +66,10 @@ jobs:
 
     steps:
 
+    # checkout code
+    - name: checkout branch
+      uses: actions/checkout@v2
+
     # log into Azure
     - name: "Login via Azure CLI"
       uses: azure/login@v1
@@ -103,7 +107,7 @@ jobs:
 
     steps:
     # checkout code
-    - name: checkout main branch
+    - name: checkout branch
       uses: actions/checkout@v2
     
     # log into Azure
@@ -112,7 +116,7 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # deploy infrastructure with Azure Bicep - push Docker Image to WebApp
+    # deploy infrastructure with Azure Bicep
     - name: Deploy infrastructure
       id: azure-deployment
       shell: pwsh
@@ -129,6 +133,21 @@ jobs:
           --parameters dockerImage=tailwindtraders-ado40:dev `
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
+
+    # Push container image to Azure WebApp
+    - name: Setup Container
+      id: container-set
+      shell: pwsh
+      run: |
+        $deployment = $(az webapp config container set  --resource-group ${{ env.DEV_RG_NAME }} `
+          --name ${{ env.DEV_WEBAPP_NAME}} `
+          --docker-custom-image-name ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:dev `
+          --docker-registry-server-url https://${{ secrets.DOCKER_LOGIN_SERVER }} `
+          --docker-registry-server-user ${{ secrets.DOCKER_USERNAME }} `
+          --docker-registry-server-password ${{ secrets.DOCKER_PASSWORD }} `
+          --output json) | ConvertFrom-Json
+      working-directory: ./TailwindTraders.Website/Deploy/IaC
+
     
     # TODO: Az CLI Deploy Container Task
 
