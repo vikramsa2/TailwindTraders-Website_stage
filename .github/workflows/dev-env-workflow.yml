@@ -1,7 +1,9 @@
 name: Developer Environment Workflow
 
 on:
-   
+  push:
+    branches: 
+      - main 
   pull_request:
     branches:
       - main 
@@ -65,7 +67,7 @@ jobs:
     # checkout code
     - name: checkout main branch
       uses: actions/checkout@v2
-      
+
     - name: Deploy infrastructure
       id: azure-deployment
       shell: pwsh
