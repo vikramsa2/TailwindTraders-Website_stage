@@ -90,7 +90,7 @@ jobs:
         
     runs-on: ubuntu-latest
     name: Deploy AppService and Container to Azure
-    needs: buildImage
+    #needs: buildImage
 
     # declare GitHub Environment - Canary
     environment:
