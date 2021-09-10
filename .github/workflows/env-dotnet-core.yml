@@ -4,8 +4,8 @@ on:
   push:
     branches: 
       - main 
-    paths:
-      - TailwindTraders.Website/Source/**   
+    # paths:
+    #   - TailwindTraders.Website/Source/**   
 
 env:
 
