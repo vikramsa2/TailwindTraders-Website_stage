@@ -1,4 +1,4 @@
-name: Developer Environment Workflow
+name: Multiple Environment Workflow
 
 on:
   push:
