@@ -1,7 +1,7 @@
-param webAppName string = 'mywebapp'
+param webAppName string = 'DEV-TailwindTraders-ADO40'
 param sku string = 'S1'
 param linuxFxVersion string = 'DOTNETCORE|5.0'
-param location string = 'centralus'
+param location string = 'westeurope'
 
 var appServicePlanName = toLower('asp-${webAppName}')
 var webSiteName = toLower('wapp-${webAppName}')

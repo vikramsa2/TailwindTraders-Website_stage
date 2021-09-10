@@ -1,8 +1,8 @@
 targetScope = 'subscription'
 
-param location string = 'centralus'
-param rgName string = 'RG-Exampe'
-param webAppName string = 'mywebapp'
+param location string = 'westeurope'
+param rgName string = 'RG-Dev-TailwindTraders'
+param webAppName string = 'DEV-TailwindTraders-ADO40'
 
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: rgName

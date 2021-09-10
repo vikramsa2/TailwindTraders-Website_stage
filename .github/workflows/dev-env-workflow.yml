@@ -98,15 +98,15 @@ jobs:
       #   --parameters dockerImage=tailwindtraders-ado40:latest \
       #   --output json
 
-    - name: Install dependencies in app
-      run: dotnet restore ./TailwindTraders.Website/Source/*.sln
+    # - name: Install dependencies in app
+    #   run: dotnet restore ./TailwindTraders.Website/Source/*.sln
    
-    - name: Build, test and publish with dotnet
-      working-directory: ./TailwindTraders.Website/Source/*.sln
-      run: |
-        dotnet build --configuration Release
-        dotnet test --no-restore --verbosity normal
-        dotnet publish -c Release -o publish
+    # - name: Build, test and publish with dotnet
+    #   working-directory: ./TailwindTraders.Website/Source/*.sln
+    #   run: |
+    #     dotnet build --configuration Release
+    #     dotnet test --no-restore --verbosity normal
+    #     dotnet publish -c Release -o publish
 
     - name: "docker login"
       uses: azure/docker-login@v1
