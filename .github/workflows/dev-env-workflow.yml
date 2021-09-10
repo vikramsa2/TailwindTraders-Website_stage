@@ -147,7 +147,9 @@ jobs:
       with:
         push: true
         tags: ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:latest
-        context: TailwindTraders-Website/TailwindTraders.Website/.devcontainer
+        context: TailwindTraders.Website/Source/Tailwind.Traders.Web/Dockerfile
+
+      
     
  
 
