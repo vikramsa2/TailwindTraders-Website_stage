@@ -8,12 +8,13 @@ env:
   DEV_RG_NAME: "RG-Dev-TailwindTraders-${{ github.event.pull_request.number }}"
 
 jobs:
-  deleteAzureResourceGroup:
+  deleteAZResourceGroup:
+    name: Delete Azure Resource Group
     runs-on: ubuntu-latest
      
     environment:
       name: Dev
-      
+
     steps:
 
     # log into Azure
@@ -36,11 +37,12 @@ jobs:
             echo "Azure resource group doesn't exist, skipping deletion"
           fi
 
-  mergeJob: 
+  mergeJob:
+    name: Confirm PR Merge  
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    needs: deleteAzureResourceGroup
+    needs: deleteAZResourceGroup
     steps:
     - run: |
-        echo PR#${{ github.event.pull_request.merged }} has been merged
+        echo PR#${{ github.event.number }} has been merged
 

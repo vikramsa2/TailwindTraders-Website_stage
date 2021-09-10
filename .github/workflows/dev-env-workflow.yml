@@ -21,7 +21,7 @@ env:
 
 jobs:
   buildTest:
-    name: build provider image
+    name: Build and Test Code
     runs-on: ubuntu-latest
     steps:
 

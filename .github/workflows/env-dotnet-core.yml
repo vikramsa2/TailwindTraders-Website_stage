@@ -6,7 +6,7 @@ on:
       - main 
     paths:
       - TailwindTraders.Website/Source/**   
-           
+
 env:
 
   # The location to store the meta data for the deployment.
@@ -20,7 +20,7 @@ env:
 
 jobs:
   buildTest:
-    name: build provider image
+    name: Build and Test Code
     runs-on: ubuntu-latest
     steps:
 
@@ -52,7 +52,7 @@ jobs:
     
 
   buildImage:
-    name: Buid and Push Docker Image
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: buildTest
 
@@ -89,7 +89,7 @@ jobs:
   deploy_container:
         
     runs-on: ubuntu-latest
-    name: Create and Deploy Container to Azure
+    name: Deploy AppService and Container to Azure
     needs: buildImage
 
     # declare GitHub Environment - Canary
