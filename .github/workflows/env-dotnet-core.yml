@@ -93,7 +93,7 @@ jobs:
     # declare GitHub Environment - Canary
     environment:
       name: canary
-      url: https://${{ secrets.WEBAPP_NAME}}.azurewebsites.net 
+      url: https://${{ secrets.WEBAPP_NAME }}.azurewebsites.net 
 
     steps:
     # checkout code
