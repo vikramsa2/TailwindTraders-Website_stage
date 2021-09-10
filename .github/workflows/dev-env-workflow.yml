@@ -1,6 +1,9 @@
 name: Developer Environment Workflow
 
 on:
+
+  workflow_dispatch:
+    
   pull_request:
     branches:
       - main 
@@ -39,8 +42,7 @@ jobs:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-   
-    # Build Docker Image and push to Azure Container Registry
+
     - name: Build and push
       id: docker_build
       uses: docker/build-push-action@v2
@@ -49,6 +51,19 @@ jobs:
         tags: ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:dev
         context: ./TailwindTraders.Website/Source/Tailwind.Traders.Web/
 
+   
+  deploy_container:
+    # Build Docker Image and push to Azure Container Registry
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    name: Create and Deploy Container to Azure
+    needs: buildImage
+
+    environment:
+      name: dev
+      url: "https://bing.com"
+
+    steps:
     - name: Deploy infrastructure
       id: azure-deployment
       shell: pwsh
@@ -61,7 +76,7 @@ jobs:
           --parameters webAppName=${{ env.DEV_WEBAPP_NAME}} `
           --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
           --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
-          --parameters dockerRegistryServerPassword=${{ steps.DOCKER_PASSWORD }} `
+          --parameters dockerRegistryServerPassword=${{ secrets.DOCKER_PASSWORD }} `
           --parameters dockerImage=tailwindtraders-ado40:dev `
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
