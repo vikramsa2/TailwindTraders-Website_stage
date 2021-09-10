@@ -49,12 +49,14 @@ jobs:
     - name: Install dependencies in app
       run: dotnet restore ./TailwindTraders.Website/Source/*.sln
 
-    - name: Build, test and publish with dotnet
-      working-directory: ./TailwindTraders.Website/Source/*.sln
-      run: |
-        dotnet build --configuration Release --no-restore
-        dotnet test --no-restore --verbosity normal
-        dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o publish  
+    - name: Build dotnet
+      run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
+   
+    - name: Test dotnet
+      run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
+    
+    - name: Publish with dotnet
+      run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production' 
     # TODO  - Build and test code
 
   buildImage:
