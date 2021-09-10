@@ -6,7 +6,8 @@ on:
       - main 
     paths:
       - TailwindTraders.Website/Deploy/IaC/**
- 
+  workflow_dispatch:
+  
 env:
 
   # The name of the resource group to be created.
