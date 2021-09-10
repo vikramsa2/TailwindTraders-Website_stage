@@ -123,7 +123,7 @@ jobs:
           --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
           --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
           --parameters dockerRegistryServerPassword=${{ secrets.DOCKER_PASSWORD }} `
-          --parameters dockerImage=tailwindtraders-ado40:dev `
+          --parameters dockerImage=tailwindtraders-ado40:${{ github.sha }} `
           --output json) | ConvertFrom-Json
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 

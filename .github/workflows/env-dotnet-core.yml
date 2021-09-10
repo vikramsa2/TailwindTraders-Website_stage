@@ -4,7 +4,9 @@ on:
   push:
     branches: 
       - main 
-            
+    paths:
+      - TailwindTraders.Website/Source/**   
+           
 env:
 
   # The location to store the meta data for the deployment.
