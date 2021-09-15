@@ -102,7 +102,7 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
     
-    # log into Azure
+    # Login to Azure
     - name: "Login via Azure CLI"
       uses: azure/login@v1
       with:
@@ -118,7 +118,7 @@ jobs:
           --template-file ./main.bicep `
           --parameters location=${{ secrets.LOCATION }} `
           --parameters rgName=${{ secrets.RG_NAME }} `
-          --parameters webAppName=${{ secrets.WEBAPP_NAME}} `
+          --parameters webAppName=${{ secrets.WEBAPP_NAME }} `
           --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
           --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
           --parameters dockerRegistryServerPassword=${{ secrets.DOCKER_PASSWORD }} `
@@ -154,10 +154,10 @@ jobs:
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 
 
-  deploy_staging:
+  deploy_blue:
         
     runs-on: ubuntu-latest
-    name: Deploy to Staging Slot
+    name: Deploy to Blue Slot
     needs: deploy_test
 
     # declare GitHub Environment - Staging
