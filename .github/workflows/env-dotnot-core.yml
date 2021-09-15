@@ -182,7 +182,7 @@ jobs:
       shell: pwsh
       run: |
         $deployment = $(az webapp config container set  --resource-group ${{ secrets.RG_NAME }} `
-          --name ${{ secrets.WEBAPP_NAME}} `
+          --name ${{ secrets.WEBAPP_NAME }} `
           --slot staging `
           --docker-custom-image-name ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:${{ github.sha }} `
           --docker-registry-server-url https://${{ secrets.DOCKER_LOGIN_SERVER }} `
