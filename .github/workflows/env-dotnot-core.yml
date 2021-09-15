@@ -132,7 +132,7 @@ jobs:
       shell: pwsh
       run: |
         $deployment = $(az webapp config container set  --resource-group ${{ secrets.RG_NAME }} `
-          --name ${{ secrets.WEBAPP_NAME}} `
+          --name ${{ secrets.WEBAPP_NAME }} `
           --docker-custom-image-name ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:${{ github.sha }} `
           --docker-registry-server-url https://${{ secrets.DOCKER_LOGIN_SERVER }} `
           --docker-registry-server-user ${{ secrets.DOCKER_USERNAME }} `
@@ -232,7 +232,7 @@ jobs:
           --template-file ./main.bicep `
           --parameters location=${{ secrets.LOCATION }} `
           --parameters rgName=${{ secrets.RG_NAME }} `
-          --parameters webAppName=${{ secrets.WEBAPP_NAME}} `
+          --parameters webAppName=${{ secrets.WEBAPP_NAME }} `
           --parameters dockerRegistryHost=${{ secrets.DOCKER_LOGIN_SERVER }} `
           --parameters dockerRegistryServerUsername=${{ secrets.DOCKER_USERNAME }} `
           --parameters dockerRegistryServerPassword=${{ secrets.DOCKER_PASSWORD }} `
@@ -246,7 +246,7 @@ jobs:
       shell: pwsh
       run: |
         $deployment = $(az webapp config container set  --resource-group ${{ secrets.RG_NAME }} `
-          --name ${{ secrets.WEBAPP_NAME}} `
+          --name ${{ secrets.WEBAPP_NAME }} `
           --docker-custom-image-name ${{ secrets.DOCKER_LOGIN_SERVER }}/tailwindtraders-ado40:${{ github.sha }} `
           --docker-registry-server-url https://${{ secrets.DOCKER_LOGIN_SERVER }} `
           --docker-registry-server-user ${{ secrets.DOCKER_USERNAME }} `
