@@ -154,10 +154,10 @@ jobs:
       working-directory: ./TailwindTraders.Website/Deploy/IaC
 
 
-  deploy_blue:
+  deploy_staging:
         
     runs-on: ubuntu-latest
-    name: Deploy to Blue Slot
+    name: Deploy to Staging Slot
     needs: deploy_test
 
     # declare GitHub Environment - Staging
