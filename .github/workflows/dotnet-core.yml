@@ -1,43 +1,84 @@
-name: WebApp Workflow - Containerized
+name: WebApp Workflow
 
 on:
   push:
     branches: [ main ]
 
+env:
+
+  # The name of the resource group to be created.
+  RG_NAME: "RG_TailwindTraders_FE"
+
+  # The location to store the meta data for the deployment.
+  LOCATION: "westeurope"
+
+  # The name of the WebApp
+  WEBAPP_NAME: "TailwindTraders-Production"
+
+  # Declaring the version of .NET to be used
+  DOTNET_VERSION: 5.x
+
+  # Declaring the version of Node to be used
+  NODE_VERSION: 10.x
+
 jobs:
-  build:
-    name: build and deploy
+  buildTest:
+    name: Build and Test Code
     runs-on: ubuntu-latest
-    env:
-      CI: ""
+    steps:
+
+    # Checkout code
+    - name: checkout branch
+      uses: actions/checkout@v2
+
+    # Setup .NET Core and Node
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install dependencies in app
+      run: dotnet restore ./TailwindTraders.Website/Source/*.sln
+
+    # Build and Test of .NET code
+    - name: Build dotnet
+      run: dotnet build ./TailwindTraders.Website/Source/*.sln --configuration Release --no-restore
+
+    - name: Test dotnet
+      run: dotnet test ./TailwindTraders.Website/Source/*.sln --no-restore --verbosity normal
+
+    - name: Publish with dotnet
+      run: dotnet publish ./TailwindTraders.Website/Source/Tailwind.Traders.Web/Tailwind.Traders.Web.csproj -c Release -o './production'
+
+  buildImage:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: buildTest
 
     steps:
-    - name: Checkout main branch
+
+    # Checkout branch
+    - name: checkout branch
       uses: actions/checkout@v2
 
     # Login to Azure
-    - name: Login via Azure CLI
-      uses: Azure/login@v1
+    - name: "Login via Azure CLI"
+      uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS}}
-
-    # Calls Azure KeyVault to fetch secrets
-    - name: Azure KeyVault 
-      uses: Azure/get-Keyvault-secrets@v1.0
-      with: 
-        keyvault: TailwindTraders-Demo-KV
-        secrets: 'DockerUsername, DockerPassword'
-      id: kvSecretAction
-      env:
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     # Login to Azure Container Registry
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
         login-server: ${{ secrets.DOCKER_LOGIN_SERVER }}
-        username: ${{ steps.kvSecretAction.outputs.DockerUsername }}
-        password: ${{ steps.kvSecretAction.outputs.DockerPassword }} 
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }} 
 
     # Build Docker image and push to Azure Container Registry
     - run: |
