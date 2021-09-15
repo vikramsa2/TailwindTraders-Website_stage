@@ -86,20 +86,20 @@ jobs:
         context: ./TailwindTraders.Website/Source/Tailwind.Traders.Web/
 
    
-  deploy_canary:
+  deploy_test:
         
     runs-on: ubuntu-latest
-    name: Deploy to Canary
+    name: Deploy to Test
     needs: buildImage
 
-    # declare GitHub Environment - Canary
+    # declare GitHub Environment - Test
     environment:
-      name: Canary
+      name: Test
       url:  ${{ steps.get-webapp-url.outputs.webAppUrl }}
  
     steps:
     # checkout code
-    - name: checkout branch
+    - name: checkout code
       uses: actions/checkout@v2
     
     # log into Azure
@@ -157,8 +157,8 @@ jobs:
   deploy_staging:
         
     runs-on: ubuntu-latest
-    name: Deploy to Staging
-    needs: deploy_canary
+    name: Deploy to Staging Slot
+    needs: deploy_test
 
     # declare GitHub Environment - Staging
     environment:
@@ -167,7 +167,7 @@ jobs:
  
     steps:
     # checkout code
-    - name: checkout branch
+    - name: checkout code
       uses: actions/checkout@v2
     
     # log into Azure
@@ -206,14 +206,14 @@ jobs:
     name: Deploy to Production
     needs: deploy_staging
 
-    # declare GitHub Environment - Production
+    # Declare GitHub Environment - Production
     environment:
       name: Production
       url:  ${{ steps.get-webapp-url.outputs.webAppUrl }}
  
     steps:
     # checkout code
-    - name: checkout branch
+    - name: checkout code
       uses: actions/checkout@v2
     
     # log into Azure
